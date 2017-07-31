@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <label> Titulo: <input type="text" id="title" /> </label> <br />
+        <label> Url: <input type="text" id="url" /> </label> <br />
+        <label> Tags: <input type="text" id="tags" /> </label> <br />
+        <input type="button" onclick="gravar();" value="Gravar" />
+    </div>
+
+    <hr />
+
+    <div>
+        <label>Procurar: <input type="text" name="termo" id="termo" /></label> <br />
+        <input type="button" onclick="procurar();" value="Procurar" />
+    </div>
+
+    <hr />
+
+    <table border=1>
+        <thead>
+            <th>Titulo</th>
+            <th>Link</th>
+            <th>Tag</th>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyAmt_rewQ1HpQRRHXhS4nMjUiSFD7Ybl44",
+        authDomain: "tutorial-83f7e.firebaseapp.com",
+        databaseURL: "https://tutorial-83f7e.firebaseio.com",
+        projectId: "tutorial-83f7e",
+        storageBucket: "",
+        messagingSenderId: "262052032394"
+      };
+      firebase.initializeApp(config);
+    </script>
+
+    <script type="text/javascript">
+        function btnGravar(){
+            title = jQuery('#title').val();
+            url = jQuery('#url').val().toString().toLowerCase();
+            tags = jQuery('#tags').val().toString().toLowerCase().split(',');
+
+            jQuery('#title').val('');
+            jQuery('#url').val('');
+            jQuery('#tags').val('');
+
+            gravar(title,url,tags);
+        }
+
+        function gravar(title, url, tags) {
+
+            tagFormated = [];
+            jQuery(tags).each(function(i,v){
+                tagFormated[v] = true;
+            });
+
+            if(title == '') {
+                alert('campos vazios são invalidos');
+                return false;
+            }
+
+            var linksRef =  firebase.database().ref('links');
+            linksRef.push ({
+               title: title,
+               title_lower_case: title.toLowerCase(),
+               url: url,
+               tags: tagFormated
+            });
+            return true;
+        }
+
+        function procurar(){
+            jQuery('table tbody').html('');
+
+            var termo = jQuery.trim( jQuery("#termo").val() );
+                termo = termo.toString().toLowerCase();
+
+            var linksRef =  firebase.database().ref('links');
+
+            linksRef
+                .orderByChild("title_lower_case")
+                .startAt(termo)
+                .endAt(termo)
+                .on("child_added",function(data){mostrarResultados(data)});
+
+            linksRef
+              .orderByChild('tags/'+termo)
+              .equalTo(true)
+              .on("child_added",function(data){mostrarResultados(data)});
+        }
+
+        function mostrarResultados(data)
+        {
+            data = data.val();
+            tr = '<tr>';
+
+            tr += '<td> '+data.title+' </td>';
+            tr += '<td> '+data.url+' </td>';
+            t = '';
+            jQuery.each(data.tags,function(i,v){
+                t += i + ', ';
+            })
+            t =  t.replace(/,\s*$/, "");
+            tr += '<td> '+t+' </td>';
+
+            tr += '</tr>';
+            jQuery('table tbody').append(tr);
+        }
+
+        function adicionarLinksDelicious()
+        {
+            jQuery(linksDelicious).each(function(i,link){
+                gravar(link.title, link.url, link.tags);
+            })
+        }
+
+
+
+
+
+
+        var linksDelicious = [
+  {
+    "title": "http://portainer.io/",
+    "url": "http://portainer.io/",
+    "tags": [
+      "docker",
+      "vm",
+      "virtualizacao"
+    ]
+  },
+  {
+    "title": "lista de jogos phaser",
+    "url": "http://pgl.ilinov.eu/",
+    "tags": [
+      "html5",
+      "phaser",
+      "jogos",
+      "jogo",
+      "game",
+      "rpg"
+    ]
+  },
+  {
+    "title": "Git com php codesniffer",
+    "url": "http://tech.zumba.com/2014/04/14/control-code-quality/",
+    "tags": [
+      "git",
+      "hoot",
+      "hook",
+      "php",
+      "codesniffer",
+      "psr",
+      "validacao",
+      "commit",
+      "pre-commit",
+      "controle",
+      "solid"
+    ]
+  },
+  {
+    "title": "Automatizando seu trabalho e se tornando mais eficiente com Docker -",
+    "url": "http://imasters.com.br/desenvolvimento/devops/automatizando-seu-trabalho-e-se-tornando-mais-eficiente-com-docker/?trace=1519021197&source",
+    "tags": [
+      "docker",
+      "php",
+      "automatizar",
+      "vagrant",
+      "virtualizacao",
+      "vm",
+      "maquina virtual",
+      "virtual",
+      "nginx",
+      "mysq",
+      "servidor",
+      "devOps",
+      "devops",
+      "linux",
+      "windows",
+      "host"
+    ]
+  },
+  {
+    "title": "Dumps Cerebrais",
+    "url": "http://dumpscerebrais.com/",
+    "tags": [
+      "php",
+      "docker",
+      "vagrant",
+      "programacao",
+      "linux"
+    ]
+  },
+  {
+    "title": "Editor Online",
+    "url": "https://pixlr.com/editor/",
+    "tags": [
+      "photography",
+      "photoshop",
+      "imagem",
+      "image",
+      "layou",
+      "layout",
+      "design",
+      "designer",
+      "editor",
+      "png",
+      "gif",
+      "jpg",
+      "jpeg"
+    ]
+  },
+  {
+    "title": "5 sites para você descobrir APIs -",
+    "url": "http://imasters.com.br/apis/5-sites-para-voce-descobrir-apis/?trace=1519021197&source=admin",
+    "tags": [
+      "api",
+      "apis",
+      "imasters",
+      "php",
+      "programacao",
+      "programação",
+      "desenvolvimento",
+      "sites",
+      "lista"
+    ]
+  },
+  {
+    "title": "Log no laravel",
+    "url": "https://murze.be/2016/06/package-log-activity-laravel-app/",
+    "tags": [
+      "log",
+      "laravel",
+      "php"
+    ]
+  },
+  {
+    "title": "componentes php",
+    "url": "https://php.libhunt.com/",
+    "tags": [
+      "php",
+      "framework",
+      "componentes",
+      "libraries",
+      "library"
+    ]
+  },
+  {
+    "title": "Sublime Text (3) for PHP Developers - Matt Stauffer on Laravel, PHP, Frontend development",
+    "url": "https://mattstauffer.co/blog/sublime-text-3-for-php-developers",
+    "tags": [
+      "sublime",
+      "ide"
+    ]
+  },
+  {
+    "title": "Calcular rota google maps",
+    "url": "http://www.c-sharpcorner.com/UploadFile/8911c4/how-to-draw-routes-and-calculate-route-time-and-distance-on/",
+    "tags": [
+      "map",
+      "google",
+      "google maps",
+      "mysql",
+      "globo",
+      "world",
+      "raio",
+      "latitude",
+      "longitude"
+    ]
+  },
+  {
+    "title": "20 melhores sites de bancos de imagens grátis - Tableless",
+    "url": "http://tableless.com.br/20-melhores-sites-de-bancos-de-imagens-gratis/",
+    "tags": [
+      "images",
+      "imagens",
+      "layout",
+      "design",
+      "webdesign",
+      "gratis"
+    ]
+  },
+  {
+    "title": "Query Mongo: MySQL to MongoDB Query Translator",
+    "url": "http://www.querymongo.com/",
+    "tags": [
+      "mongodb",
+      "mysql",
+      "sql",
+      "mongo",
+      "query",
+      "database",
+      "nosql",
+      "convert"
+    ]
+  },
+  {
+    "title": "46 PHP code Snippets to help you with your PHP projects",
+    "url": "http://blog.koonk.com/2015/07/46-useful-php-code-snippets-that-can-help-you-with-your-php-projects/",
+    "tags": [
+      "php",
+      "codigos",
+      "snippets",
+      "code",
+      "mail",
+      "data",
+      "date"
+    ]
+  },
+  {
+    "title": "Como trabalhar com tags no Git -",
+    "url": "http://imasters.com.br/artigo/21127/software-livre/como-trabalhar-com-tags-no-git/",
+    "tags": [
+      "git",
+      "tags",
+      "controledeversao_git",
+      "git tags",
+      "repositórios",
+      "tutoriais",
+      "branch",
+      "controle",
+      "de",
+      "versão",
+      "versao"
+    ]
+  },
+  {
+    "title": "Designer Contente :) - O melhor conteúdo gráfico para você ficar contente!",
+    "url": "http://designercontente.com/#",
+    "tags": [
+      "layout",
+      "frontend",
+      "designer",
+      "psd",
+      "html",
+      "css",
+      "html5",
+      "css3"
+    ]
+  },
+  {
+    "title": "Vertical Timeline | CodyHouse",
+    "url": "http://codyhouse.co/gem/vertical-timeline/",
+    "tags": [
+      "css3",
+      "gratis",
+      "graça",
+      "graca",
+      "free",
+      "timeline",
+      "css",
+      "js",
+      "time",
+      "bootstrap",
+      "verticaltimeline",
+      "template",
+      "dev",
+      "portfolio",
+      "resources"
+    ]
+  },
+  {
+    "title": "30 Free Responsive HTML5 CSS3 Templates for Designers | Code Geekz",
+    "url": "https://codegeekz.com/free-responsive-html5-css3-templates/",
+    "tags": [
+      "layout",
+      "css3",
+      "free",
+      "frontend",
+      "graça",
+      "html5",
+      "templates",
+      "template",
+      "responsive",
+      "resources",
+      "res[ponsive",
+      "designers",
+      "download",
+      "portfolio"
+    ]
+  },
+  {
+    "title": "Chosen: A jQuery Plugin by Harvest to Tame Unwieldy Select Boxes",
+    "url": "http://harvesthq.github.io/chosen/",
+    "tags": [
+      "jquery",
+      "javascript",
+      "select",
+      "plugin",
+      "dropdown",
+      "form",
+      "forms",
+      "webdev",
+      "multiselect",
+      "selectbox"
+    ]
+  },
+  {
+    "title": "Searching for Bootstrap code snippets | Bootsnipp.com",
+    "url": "http://bootsnipp.com/search?q=menu",
+    "tags": [
+      "bootstrap",
+      "menu",
+      "slide",
+      "css",
+      "html",
+      "javascript",
+      "twitter",
+      "mobile",
+      "responsive"
+    ]
+  },
+  {
+    "title": "Apple Push Notification Services in iOS 6 Tutorial: Part 1/2 | Ray Wenderlich",
+    "url": "http://www.raywenderlich.com/32960/apple-push-notification-services-in-ios-6-tutorial-part-1",
+    "tags": [
+      "ios",
+      "push",
+      "notification",
+      "development",
+      "php",
+      "pushnotification",
+      "create",
+      "server",
+      "webdev",
+      "profile",
+      "provision",
+      "apple",
+      "developer"
+    ]
+  },
+  {
+    "title": "Unsplash | Free High-Resolution Photos",
+    "url": "https://unsplash.com/",
+    "tags": [
+      "photography",
+      "free",
+      "photo",
+      "images",
+      "webdesign",
+      "fotos",
+      "placeholder"
+    ]
+  },
+  {
+    "title": "Using Bitbucket for Automated Deployments - Brandon Summers",
+    "url": "http://brandonsummers.name/blog/2012/02/10/using-bitbucket-for-automated-deployments/",
+    "tags": [
+      "git",
+      "automation",
+      "bitbucket",
+      "deployment",
+      "automateddeployment",
+      "gitdeployment",
+      "ftp",
+      "deploy"
+    ]
+  },
+  {
+    "title": "phanan/htaccess · GitHub",
+    "url": "https://github.com/phanan/htaccess",
+    "tags": [
+      "htaccess",
+      "apache",
+      "snippets",
+      "reference",
+      "webdev",
+      "linux",
+      "web",
+      "modrewrite",
+      "howto",
+      "sysadmin"
+    ]
+  },
+  {
+    "title": "Bootstrap responsive developer template",
+    "url": "http://bootstrapzero.com/bootstrap-template/responsive-developer",
+    "tags": [
+      "theme",
+      "bootstrap",
+      "tema",
+      "html5"
+    ]
+  },
+  {
+    "title": "NativeScript",
+    "url": "https://www.nativescript.org/",
+    "tags": [
+      "javascript",
+      "native",
+      "apps",
+      "android",
+      "mobile",
+      "ios",
+      "hybrid",
+      "development",
+      "crossplatform",
+      "js",
+      "css",
+      "html5",
+      "html",
+      "css3",
+      "phonegap",
+      "cordova",
+      "aplicativo"
+    ]
+  },
+  {
+    "title": "PhoneGap tutorial - Iniciando um projeto (completo) - Nano Incub",
+    "url": "http://www.nanoincub.com.br/blog/tutoriais/tutorial-de-phonegap-iniciando-um-projeto",
+    "tags": [
+      "phonegap",
+      "cordova",
+      "completo",
+      "ambiente",
+      "aplicativo",
+      "app"
+    ]
+  },
+  {
+    "title": "New Email Test — Litmus PutsMail",
+    "url": "https://putsmail.com/tests/new",
+    "tags": [
+      "newsletter",
+      "teste",
+      "email",
+      "layout",
+      "html",
+      "marketing",
+      "front",
+      "css",
+      "htm5",
+      "css3"
+    ]
+  },
+  {
+    "title": "Visual Studio Tools for Apache Cordova",
+    "url": "http://www.visualstudio.com/en-us/explore/cordova-vs.aspx",
+    "tags": [
+      "visualstudio",
+      "cordova",
+      "hybrid",
+      "mobile",
+      "programming",
+      "tutorial",
+      "phonegap",
+      "html5",
+      "css",
+      "c#",
+      ".net"
+    ]
+  },
+  {
+    "title": "Using Cordova and Visual Studio to build iOS Mobile Apps - Rick Strahl's Web Log",
+    "url": "http://weblog.west-wind.com/posts/2015/Jan/06/Using-Cordova-and-Visual-Studio-to-build-iOS-Mobile-Apps",
+    "tags": [
+      "cordova",
+      "ios",
+      "phonegap",
+      "visualstudio",
+      "mobile",
+      "blogs",
+      "html5",
+      "c#",
+      ".net",
+      "javascript",
+      "android",
+      "windows phone",
+      "celular",
+      "aplicativo",
+      "app",
+      "apple"
+    ]
+  },
+  {
+    "title": "Onsen UI - A Custom Elements-Based HTML5 UI Framework | Onsen UI",
+    "url": "http://onsen.io/",
+    "tags": [
+      "framework",
+      "javascript",
+      "mobile",
+      "phonegap",
+      "hybrid",
+      "html5",
+      "webapp",
+      "ui",
+      "cordova",
+      "angularjs"
+    ]
+  },
+  {
+    "title": "Text to ASCII Art Generator (TAAG)",
+    "url": "http://patorjk.com/software/taag/#p=display&f=Banner3&t=Type%20Something%20",
+    "tags": [
+      "ascii",
+      "art",
+      "generator",
+      "text",
+      "tools",
+      "fonts",
+      "utility",
+      "web2.0",
+      "fun",
+      "generador",
+      "texto",
+      "gerador de texto",
+      "marcar",
+      "css"
+    ]
+  },
+  {
+    "title": "Documentation - Materialize",
+    "url": "http://materializecss.com/",
+    "tags": [
+      "css",
+      "framework",
+      "materialdesign",
+      "responsive",
+      "material",
+      "design",
+      "webdesign",
+      "web",
+      "grid",
+      "webdev",
+      "phonegap",
+      "front",
+      "frontend",
+      "layout",
+      "cordova",
+      "ionic",
+      "google",
+      "mateial design",
+      "android",
+      "lolipop",
+      "android 5"
+    ]
+  },
+  {
+    "title": "120 Best Free Flat Design Resources for Designers | Pencil Scoop | Web Design & Development",
+    "url": "http://www.pencilscoop.com/2013/09/120-free-flat-design-resources-for-designers/",
+    "tags": [
+      "design",
+      "ui",
+      "flat",
+      "psd",
+      "template",
+      "ios",
+      "layout",
+      "html",
+      "front",
+      "frontend"
+    ]
+  },
+  {
+    "title": "HTML5 UP! Responsive HTML5 and CSS3 Site Templates",
+    "url": "http://html5up.net/",
+    "tags": [
+      "mobile",
+      "celular",
+      "gratis",
+      "template",
+      "frontend",
+      "front",
+      "layout",
+      "html",
+      "web",
+      "responsivedesign",
+      "html5",
+      "templates",
+      "responsive",
+      "webdesign",
+      "free",
+      "css3",
+      "design"
+    ]
+  },
+  {
+    "title": "How to create REST API for Android app using PHP, Slim and MySQL - Day 1/2",
+    "url": "http://www.androidhive.info/2014/01/how-to-create-rest-api-for-android-app-using-php-slim-and-mysql-day-12-2/",
+    "tags": [
+      "android",
+      "php",
+      "rest",
+      "mysql",
+      "restful",
+      "tutorial",
+      "slim",
+      "framework"
+    ]
+  },
+  {
+    "title": "Material UI - Material Design React Components",
+    "url": "http://material-ui.com/",
+    "tags": [
+      "css",
+      "framework",
+      "ui",
+      "materialdesign",
+      "google",
+      "reactjs",
+      "material",
+      "bootstrap",
+      "cssframework",
+      "react"
+    ]
+  },
+  {
+    "title": "IBM Worklight - Desenvolvimento mobile multiplataforma",
+    "url": "http://www.devmedia.com.br/ibm-worklight-desenvolvimento-mobile-multiplataforma/28538",
+    "tags": [
+      "Worklight",
+      "phonegap",
+      "cordova",
+      "mobile",
+      "android",
+      "iphone",
+      "html5",
+      "javascript",
+      "js",
+      "eclipse",
+      "ibm",
+      "ide",
+      "editor"
+    ]
+  },
+  {
+    "title": "jQuery Tags Input Plugin - Convert boring text inputs into magical tagging interfaces - XOXCO.com",
+    "url": "http://xoxco.com/projects/code/tagsinput/",
+    "tags": [
+      "jquery",
+      "plugin",
+      "tags",
+      "development",
+      "javascript",
+      "javascriptwidget",
+      "slopesquad",
+      "webdeveloper",
+      "categoria"
+    ]
+  },
+  {
+    "title": "10 jQuery Tagging and Tag Clouds",
+    "url": "http://www.sitepoint.com/10-jquery-tagging-tag-clouds/",
+    "tags": [
+      "tag",
+      "tags",
+      "tagcloud",
+      "categoria",
+      "jquery",
+      "javascript"
+    ]
+  },
+  {
+    "title": "Conheça os Frameworks CSS minimalistas",
+    "url": "http://blog.turbosite.com.br/conheca-os-frameworks-css-minimalistas/",
+    "tags": [
+      "css",
+      "css3",
+      "tema",
+      "theme",
+      "minimalista",
+      "frontend",
+      "front",
+      "bootstrap",
+      "framework"
+    ]
+  },
+  {
+    "title": "Luster",
+    "url": "http://www.luster.io/blog/9-29-14-mobile-web-checklist.html",
+    "tags": [
+      "checklist",
+      "phonegap",
+      "cordova",
+      "aplicativo",
+      "app",
+      "mobile",
+      "celular",
+      "android",
+      "apple",
+      "iphone"
+    ]
+  },
+  {
+    "title": "20 Fresh Flat UI Designs Free to Download | Freebies",
+    "url": "http://webdesignledger.com/freebies/20-fresh-flat-ui-designs-free-to-download",
+    "tags": [
+      "flat",
+      "webdesign",
+      "design",
+      "html",
+      "psd",
+      "frontend"
+    ]
+  },
+  {
+    "title": "Capturando erros JS LIKE-A-BOSS | Tableless",
+    "url": "http://tableless.com.br/capturando-erros-js-like-a-boss/",
+    "tags": [
+      "erros",
+      "javascript",
+      "try",
+      "catch"
+    ]
+  },
+  {
+    "title": "All Cordova and PhoneGap Plugins",
+    "url": "http://plugreg.com/plugins",
+    "tags": [
+      "cordova",
+      "phonegap",
+      "plugins"
+    ]
+  },
+  {
+    "title": "Como submeter um aplicativo para Apple Store - Blog WeBizz – com Pierre Maciel",
+    "url": "http://blog.webizz.biz/2013/07/09/como-submeter-um-aplicativo-para-apple-store/",
+    "tags": [
+      "phonegap",
+      "cordova",
+      "apple",
+      "certificado",
+      "profile",
+      "aplicativo",
+      "app"
+    ]
+  },
+  {
+    "title": "Usando o Vagrant como ambiente de desenvolvimento no Windows - Simples Ideias",
+    "url": "http://simplesideias.com.br/usando-o-vagrant-como-ambiente-de-desenvolvimento-no-windows",
+    "tags": [
+      "tutorial",
+      "windows",
+      "vagrant",
+      "vitual",
+      "dev",
+      "linux",
+      "vm"
+    ]
+  },
+  {
+    "title": "All Facebook Image Dimensions: Timeline, Posts, Ads [Infographic] - Jon Loomer Digital",
+    "url": "http://www.jonloomer.com/2014/01/20/facebook-image-dimensions/",
+    "tags": [
+      "facebook",
+      "imagens",
+      "tamanho",
+      "resolução",
+      "dimensão",
+      "dimensions",
+      "facebookimages",
+      "facebookpages",
+      "infographic",
+      "images",
+      "image",
+      "socialmedia",
+      "marketing",
+      "design"
+    ]
+  },
+  {
+    "title": "jQuery: diferença entre bind, live, delegate, on | Douglas Matoso",
+    "url": "http://blog.dmatoso.com/2012/11/jquery-bind-live-delegate-on/",
+    "tags": [
+      "delegate",
+      "diference",
+      "jquery",
+      "live",
+      "bind",
+      "on",
+      "off"
+    ]
+  },
+  {
+    "title": "Script de migração de URL do banco de dados Wordpress | Dicas Obiz",
+    "url": "http://dicas.obiz.com.br/artigo/script-de-migra%C3%A7%C3%A3o-de-url-do-banco-de-dados-wordpress",
+    "tags": [
+      "wordpress",
+      "migracao"
+    ]
+  },
+  {
+    "title": "Cordova (aka PhoneGap) 3.x Tutorial | Christophe Coenraets",
+    "url": "http://coenraets.org/blog/cordova-phonegap-3-tutorial/",
+    "tags": [
+      "cordova",
+      "phonegap",
+      "html5",
+      "mobile",
+      "javascript",
+      "programming",
+      "tutorial"
+    ]
+  },
+  {
+    "title": "Customize Google Maps API Styled Map Wizard",
+    "url": "http://gmaps-samples-v3.googlecode.com/svn/trunk/styledmaps/wizard/index.html?utm_source=buffer&utm_campaign=Buffer&utm_content=buffercd5d4&utm_medium=google",
+    "tags": [
+      "maps",
+      "style",
+      "googlemaps",
+      "api",
+      "tools",
+      "design",
+      "map",
+      "css",
+      "google",
+      "javascript",
+      "customize"
+    ]
+  },
+  {
+    "title": "Raio de busca no Google Maps com MySQL",
+    "url": "http://www.polaticus.com.br/index.php/2010/02/23/raio-de-busca-no-google-maps-com-mysql/",
+    "tags": [
+      "google maps",
+      "maps",
+      "raio",
+      "rota",
+      "busca"
+    ]
+  },
+  {
+    "title": "murtaugh/HTML5-Reset-WordPress-Theme · GitHub",
+    "url": "https://github.com/murtaugh/HTML5-Reset-Wordpress-Theme",
+    "tags": [
+      "blank",
+      "css3",
+      "theme",
+      "html5",
+      "reset",
+      "wordpress"
+    ]
+  },
+  {
+    "title": "URL Decoder/Encoder",
+    "url": "http://meyerweb.com/eric/tools/dencoder/",
+    "tags": [
+      "javascript",
+      "encode",
+      "tools",
+      "programming",
+      "development",
+      "html",
+      "web",
+      "decoder",
+      "url",
+      "encoder"
+    ]
+  },
+  {
+    "title": "Lazy Load Plugin for jQuery",
+    "url": "http://www.appelsiini.net/projects/lazyload",
+    "tags": [
+      "javascript",
+      "webdev",
+      "imageload",
+      "loading",
+      "imagens",
+      "image",
+      "loadings",
+      "jquery",
+      "plugin",
+      "webdesign",
+      "imagem",
+      "programming",
+      "performance",
+      "ajax",
+      "images",
+      "lazyload"
+    ]
+  },
+  {
+    "title": "Yii Examples of Using CDbCriteria | sonsonz",
+    "url": "http://sonsonz.wordpress.com/2011/10/14/yii-examples-of-using-cdbcriteria/",
+    "tags": [
+      "criteria",
+      "exemplos",
+      "yii",
+      "example"
+    ]
+  },
+  {
+    "title": "95+ Free Responsive HTML5 CSS3 Website Templates | Designrazzi",
+    "url": "http://www.designrazzi.com/2013/free-css3-html5-templates/",
+    "tags": [
+      "template",
+      "free",
+      "css3",
+      "html5",
+      "html",
+      "gratis",
+      "jquery",
+      "css"
+    ]
+  },
+  {
+    "title": "Furatto :: Javascript",
+    "url": "http://icalialabs.github.io/furatto/javascript.html",
+    "tags": [
+      "template",
+      "bootstrap",
+      "html5",
+      "css"
+    ]
+  },
+  {
+    "title": "facebook like, comments and tweet button for ajax items | ClearWebSolutions – Fast. Expensive. Awesome!",
+    "url": "http://www.clear-web-solutions.com/blog/2012/04/29/facebook-like-comments-and-tweet-button-for-ajax-items/",
+    "tags": [
+      "ajax",
+      "facebook",
+      "tweet"
+    ]
+  },
+  {
+    "title": "Customize checkboxes and radio buttons with iCheck (jQuery and Zepto) plugin",
+    "url": "http://damirfoy.com/iCheck/#skins",
+    "tags": [
+      "check",
+      "checkbox",
+      "checkboxes",
+      "jquery",
+      "plugin",
+      "forms",
+      "skins"
+    ]
+  },
+  {
+    "title": "jquer.in » Collection of jquery plugins and javascript libraries.",
+    "url": "http://jquer.in/",
+    "tags": [
+      "jquery plugins",
+      "webdesign",
+      "javascript",
+      "resources",
+      "webdev",
+      "plugins",
+      "web",
+      "collection",
+      "jquery",
+      "plugin",
+      "directory",
+      "jqueryplugin",
+      "tips",
+      "awesome",
+      "resource"
+    ]
+  },
+  {
+    "title": "AJAX loading GIF and APNG spinners, bars and 3D animations generator",
+    "url": "http://www.preloaders.net/",
+    "tags": [
+      "webdesign",
+      "tools",
+      "loading",
+      "ajax",
+      "generator",
+      "load",
+      "wait",
+      "preloader",
+      "design",
+      "gif"
+    ]
+  },
+  {
+    "title": "Online JavaScript beautifier",
+    "url": "http://jsbeautifier.org/",
+    "tags": [
+      "javascript",
+      "descompactar",
+      "tools",
+      "programming",
+      "development",
+      "beautifier",
+      "beautify",
+      "js",
+      "web",
+      "code",
+      "uncompress",
+      "formatting"
+    ]
+  },
+  {
+    "title": "Nifty Modal Window Effects",
+    "url": "http://tympanus.net/Development/ModalWindowEffects/",
+    "tags": [
+      "webdesign",
+      "window",
+      "animation",
+      "popup",
+      "css3",
+      "CSS",
+      "effects",
+      "jquery",
+      "modal"
+    ]
+  },
+  {
+    "title": "Unheap - A tidy repository of jQuery plugins",
+    "url": "http://www.unheap.com/section/media/dialogs-lightboxes/",
+    "tags": [
+      "javascript",
+      "layout",
+      "arte",
+      "html5",
+      "html",
+      "jquery",
+      "css",
+      "referencia"
+    ]
+  },
+  {
+    "title": "Customize checkboxes and radio buttons with iCheck (jQuery and Zepto) plugin",
+    "url": "http://damirfoy.com/iCheck/",
+    "tags": [
+      "javascript",
+      "form",
+      "check",
+      "radiobutton",
+      "personalizado",
+      "jquery",
+      "plugin",
+      "html5",
+      "checkbox",
+      "radio",
+      "html",
+      "customizado",
+      "checkboxes",
+      "forms",
+      "css"
+    ]
+  },
+  {
+    "title": "Google Maps Colorizr",
+    "url": "http://software.stadtwerk.org/google_maps_colorizr/",
+    "tags": [
+      "google",
+      "webdevelopment",
+      "webdev",
+      "maps",
+      "map"
+    ]
+  },
+  {
+    "title": "Custom Google Maps Style Tool | Think Tank",
+    "url": "http://www.evoluted.net/thinktank/web-design/custom-google-maps-style-tool",
+    "tags": [
+      "google maps",
+      "google",
+      "maps",
+      "map",
+      "styling",
+      "style tool"
+    ]
+  },
+  {
+    "title": "Unheap - A tidy repository of jQuery plugins",
+    "url": "http://www.unheap.com/",
+    "tags": [
+      "javascript",
+      "Javascript",
+      "resources",
+      "webdev",
+      "development",
+      "plugins",
+      "js",
+      "collection",
+      "interface",
+      "jquery",
+      "plugin",
+      "webdesign",
+      "layout",
+      "html"
+    ]
+  },
+  {
+    "title": "Placehold.it - Quick and simple image placeholders",
+    "url": "http://placehold.it/",
+    "tags": [
+      "lorem",
+      "placeholder",
+      "image",
+      "imagens",
+      "block",
+      "webdesign",
+      "gerador",
+      "tools",
+      "lorempixel",
+      "html5",
+      "generator",
+      "images",
+      "design",
+      "css"
+    ]
+  },
+  {
+    "title": "Color Thief | jQuery plugin to grab the color pattern from image",
+    "url": "http://jquer.in/jquery-plugins-for-html5-canvas/color-thief/",
+    "tags": [
+      "html5",
+      "jquery",
+      "cores"
+    ]
+  },
+  {
+    "title": ".: FLASH VS HTML :.",
+    "url": "http://www.flashvhtml.com/",
+    "tags": [
+      "from facebook"
+    ]
+  },
+  {
+    "title": "Gustavo Salgado - YouTube",
+    "url": "http://www.youtube.com/user/Gustalh?feature=watch",
+    "tags": [
+      "yii",
+      "php",
+      "framework"
+    ]
+  },
+  {
+    "title": "Skifree.js",
+    "url": "http://basicallydan.github.com/skifree.js/",
+    "tags": [
+      "from facebook"
+    ]
+  },
+  {
+    "title": "MySQL to SQlite - Ferramenta para converter MySQL para SQLite",
+    "url": "http://mysql2sqlite.felipemarques.com.br/",
+    "tags": [
+      "WebDev",
+      "banco de dados",
+      "mysqltosqllite",
+      "SQLite",
+      "mysql2sqllite",
+      "sqllite",
+      "database",
+      "mysql"
+    ]
+  },
+  {
+    "title": "Tópicos Especiais: Registros (Logs) | The Definitive Guide to Yii | Yii Framework",
+    "url": "http://www.yiiframework.com/doc/guide/1.1/pt/topics.logging",
+    "tags": [
+      "erro",
+      "yii",
+      "php",
+      "debug",
+      "log"
+    ]
+  },
+  {
+    "title": "Tópicos Especiais: Gerenciamento de URL | The Definitive Guide to Yii | Yii Framework",
+    "url": "http://www.yiiframework.com/doc/guide/1.1/pt/topics.url",
+    "tags": [
+      "amigavel",
+      "yii",
+      "php",
+      "url",
+      "URLAmigaveis"
+    ]
+  },
+  {
+    "title": "YouTube Player Demo - YouTube — Google Developers",
+    "url": "https://developers.google.com/youtube/youtube_player_demo",
+    "tags": [
+      "webdesign",
+      "javascript",
+      "resources",
+      "youtube player",
+      "videos",
+      "youtube",
+      "api",
+      "status video",
+      "web_youtube_video",
+      "embed",
+      "video"
+    ]
+  },
+  {
+    "title": "url amigavel",
+    "url": "http://code.imasters.com.br/index.php?/topic/429-funcao-de-conversao-de-string-para-url-amigavel/",
+    "tags": [
+      "programação",
+      "php",
+      "url",
+      "URLAmigaveis"
+    ]
+  },
+  {
+    "title": "class.upload.php samples, a files uploading and images manipulation PHP class - verot.net",
+    "url": "http://www.verot.net/php_class_upload_samples.htm",
+    "tags": [
+      "php",
+      "resize",
+      "imagens",
+      "image",
+      "imagem",
+      "upload",
+      "yii"
+    ]
+  },
+  {
+    "title": "Tutorial: como criar abas customizadas (timeline apps) para sua fanpage no Facebook - Mídias Sociais » EntreBits",
+    "url": "http://entrebits.com.br/post/2012/03/30/tutorial-como-criar-abas-customizadas-timeline-apps-para-sua-fanpage-no-facebook",
+    "tags": [
+      "aplicativo",
+      "app",
+      "fanpage",
+      "timeline",
+      "facebook"
+    ]
+  },
+  {
+    "title": "Dean Gray's sets on SoundCloud - Create, record and share your sounds for free",
+    "url": "http://soundcloud.com/dean-gray/sets",
+    "tags": [
+      "dean gray",
+      "green day"
+    ]
+  },
+  {
+    "title": "WordPress › Fórum Brasileiro » Formulário na home",
+    "url": "http://br.forums.wordpress.org/topic/formulario-na-home?replies=2",
+    "tags": [
+      "contato",
+      "contact",
+      "wordpress"
+    ]
+  },
+  {
+    "title": "How to create a built-in contact form for your WordPress theme | CatsWhoCode.com",
+    "url": "http://www.catswhocode.com/blog/how-to-create-a-built-in-contact-form-for-your-wordpress-theme",
+    "tags": [
+      "formulario",
+      "contato",
+      "php",
+      "jquery",
+      "contact",
+      "wordpress"
+    ]
+  },
+  {
+    "title": "Gerador automatico de imagens",
+    "url": "http://lorempixel.com/",
+    "tags": [
+      "imagens",
+      "image",
+      "generator",
+      "images",
+      "lorempixum"
+    ]
+  },
+  {
+    "title": "HUFERSIL.WEBDEVELOPER | Blog sobre desenvolvimento e tecnologia, focado em PHP, Lumine, ActionScript, Flex e outras linguagens Web",
+    "url": "http://www.hufersil.com.br/",
+    "tags": [
+      "lumine",
+      "programação",
+      "desenvolvimento",
+      "framework",
+      "php"
+    ]
+  },
+  {
+    "title": "Reference: Model rules validation | Wiki | Yii Framework",
+    "url": "http://www.yiiframework.com/wiki/56/",
+    "tags": [
+      "yii"
+    ]
+  },
+  {
+    "title": "CActiveRecord | Class Reference | Yii Framework",
+    "url": "http://www.yiiframework.com/doc/api/1.1/CActiveRecord",
+    "tags": [
+      "ActiveRecord",
+      "yii"
+    ]
+  },
+  {
+    "title": "Create a new Fiddle - jsFiddle",
+    "url": "http://jsfiddle.net/",
+    "tags": [
+      "JQuery",
+      "javascript",
+      "debug",
+      "online"
+    ]
+  },
+  {
+    "title": "Online JSON Viewer",
+    "url": "http://jsonviewer.stack.hu/",
+    "tags": [
+      "ident",
+      "json",
+      "view",
+      "viewer",
+      "lint"
+    ]
+  },
+  {
+    "title": "O Desenvolvedor",
+    "url": "http://odesenvolvedor.andafter.org/",
+    "tags": [
+      "php",
+      "programação"
+    ]
+  },
+  {
+    "title": "sql server - SQL : in clause in storedprocedure:how to pass values - Stack Overflow",
+    "url": "http://stackoverflow.com/questions/1525126/sql-in-clause-in-storedprocedurehow-to-pass-values",
+    "tags": [
+      "function",
+      "função",
+      "funcao",
+      "procedure",
+      "sqlserver",
+      "sql"
+    ]
+  },
+  {
+    "title": "Best Open Source Resources for Web Developers | WebAppers",
+    "url": "http://www.webappers.com/",
+    "tags": [
+      "jquery"
+    ]
+  },
+  {
+    "title": "Localizar procedures que contenham determinada palavra - SQL (Sql Server)",
+    "url": "http://codigofonte.uol.com.br/codigo/sql/sql-server/localizar-procedures-que-contenham-determinada-palavra",
+    "tags": [
+      "SqlServer",
+      "Procedure"
+    ]
+  },
+  {
+    "title": "Bugs de url Serialize",
+    "url": "http://www.the-art-of-web.com/javascript/escape/",
+    "tags": [
+      "php",
+      "types",
+      "decode",
+      "encode",
+      "serialize",
+      "url"
+    ]
+  },
+  {
+    "title": "New tutorials | Hello Android",
+    "url": "http://www.helloandroid.com/tutorials",
+    "tags": [
+      "android",
+      "tutorial",
+      "java"
+    ]
+  },
+  {
+    "title": "Desenvolvimento Android (1)",
+    "url": "http://www.felipesilveira.com.br/minicurso-android/#(1)",
+    "tags": [
+      "android",
+      "tutorial",
+      "java"
+    ]
+  },
+  {
+    "title": "Android Tutorial",
+    "url": "http://www.mkyong.com/tutorials/android-tutorial/",
+    "tags": [
+      "tutorial",
+      "java",
+      "android"
+    ]
+  },
+  {
+    "title": "OlhoNoBit",
+    "url": "http://olhonobit.wordpress.com/",
+    "tags": [
+      "programação",
+      "jquery",
+      "c#",
+      "net"
+    ]
+  },
+  {
+    "title": "How To Make Facebook Fan Page iFrame App Auto Resize « The OSM Blog",
+    "url": "http://theosmblog.com/2011/03/24/facebook-fan-page-iframe-app-auto-resize/",
+    "tags": [
+      "fanpage",
+      "facebook"
+    ]
+  },
+  {
+    "title": "codebreak - simples assim | tutoriais, dicas, exemplos de ASP.NET, C#, SQL, AJAX, Javascript, Windows Phone 7",
+    "url": "http://cbsa.com.br/default.aspx",
+    "tags": [
+      ".net",
+      "c#"
+    ]
+  },
+  {
+    "title": "How to use Razor in Umbraco - Paging | Cultiv Web Solutions",
+    "url": "http://cultiv.nl/blog/2011/2/17/how-to-use-razor-in-umbraco-paging/",
+    "tags": [
+      "paginacao",
+      "razor",
+      "umbraco"
+    ]
+  },
+  {
+    "title": "JQuery Cycle Plugin - More Demos",
+    "url": "http://jquery.malsup.com/cycle/more.html?v2.23",
+    "tags": [
+      "cycle",
+      "jquery"
+    ]
+  }
+];
+
+    </script>
+</body>
+</html>
