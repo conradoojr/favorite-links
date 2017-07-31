@@ -5,6 +5,9 @@
     <title>Document</title>
 </head>
 <body>
+    <div class="login">
+        <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"> </fb:login-button>
+    </div>
     <div>
         <label> Titulo: <input type="text" id="title" /> </label> <br />
         <label> Url: <input type="text" id="url" /> </label> <br />
@@ -33,17 +36,49 @@
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
-    <script>
-      // Initialize Firebase
-      var config = {
-        apiKey: "AIzaSyAmt_rewQ1HpQRRHXhS4nMjUiSFD7Ybl44",
-        authDomain: "tutorial-83f7e.firebaseapp.com",
-        databaseURL: "https://tutorial-83f7e.firebaseio.com",
-        projectId: "tutorial-83f7e",
-        storageBucket: "",
-        messagingSenderId: "262052032394"
-      };
-      firebase.initializeApp(config);
+    <script type="text/javascript">
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyAmt_rewQ1HpQRRHXhS4nMjUiSFD7Ybl44",
+            authDomain: "tutorial-83f7e.firebaseapp.com",
+            databaseURL: "https://tutorial-83f7e.firebaseio.com",
+            projectId: "tutorial-83f7e",
+            storageBucket: "",
+            messagingSenderId: "262052032394"
+        };
+        firebase.initializeApp(config);
+    </script>
+
+    <script type="text/javascript">
+        window.fbAsyncInit = function() {
+            FB.init({
+            appId      : '665977053610692',
+            cookie     : true,
+            xfbml      : true,
+            version    : 'v2.8'
+            });
+            FB.AppEvents.logPageView();
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+    <script type="text/javascript">
+        function statusChangeCallback(response) {
+            console.log(response);
+        }
+
+        function checkLoginState() {
+          FB.getLoginStatus(function(response) {
+            statusChangeCallback(response);
+          });
+        }
     </script>
 
     <script type="text/javascript">
